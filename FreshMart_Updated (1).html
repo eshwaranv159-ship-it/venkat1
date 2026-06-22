@@ -1,0 +1,1855 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshMart - Fresh Grocery Delivery</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #22c55e;
+  --green-dark: #16a34a;
+  --green-light: #bbf7d0;
+  --orange: #f97316;
+  --orange-light: #fed7aa;
+  --yellow: #fbbf24;
+  --red: #ef4444;
+  --bg: #f0fdf4;
+  --white: #ffffff;
+  --card: #ffffff;
+  --text: #1a2e1a;
+  --text2: #4b5563;
+  --border: #d1fae5;
+  --shadow: 0 4px 24px rgba(34,197,94,0.12);
+  --radius: 18px;
+  --radius-sm: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+button{cursor:pointer;border:none;outline:none;font-family:'Nunito',sans-serif;}
+input,select,textarea{font-family:'Nunito',sans-serif;outline:none;}
+
+/* ===== SPLASH SCREEN ===== */
+#splash{position:fixed;inset:0;background:linear-gradient(135deg,#16a34a 0%,#22c55e 50%,#86efac 100%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s ease;}
+#splash.hide{opacity:0;pointer-events:none;}
+.splash-logo{font-size:72px;animation:bounce 1s infinite alternate;}
+.splash-title{color:#fff;font-size:38px;font-weight:900;letter-spacing:2px;margin-top:12px;animation:fadeUp 0.8s ease 0.3s both;}
+.splash-sub{color:#bbf7d0;font-size:16px;font-weight:600;margin-top:6px;animation:fadeUp 0.8s ease 0.6s both;}
+.splash-bar{width:220px;height:5px;background:rgba(255,255,255,0.3);border-radius:10px;margin-top:40px;overflow:hidden;}
+.splash-bar-fill{height:100%;background:#fff;border-radius:10px;animation:loadBar 2.5s ease forwards;}
+@keyframes bounce{0%{transform:translateY(0);}100%{transform:translateY(-18px);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes loadBar{0%{width:0%;}100%{width:100%;}}
+
+/* ===== AUTH SCREEN ===== */
+#authScreen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#f0fdf4 0%,#dcfce7 100%);z-index:1000;overflow-y:auto;padding:20px;}
+.auth-box{max-width:420px;margin:40px auto;background:#fff;border-radius:24px;padding:36px 32px;box-shadow:0 8px 40px rgba(34,197,94,0.18);}
+.auth-logo{text-align:center;font-size:48px;margin-bottom:8px;}
+.auth-title{text-align:center;font-size:26px;font-weight:900;color:var(--green-dark);margin-bottom:4px;}
+.auth-sub{text-align:center;font-size:14px;color:var(--text2);margin-bottom:28px;}
+.auth-tabs{display:flex;gap:8px;margin-bottom:24px;background:#f0fdf4;border-radius:12px;padding:4px;}
+.auth-tab{flex:1;padding:10px;border-radius:10px;background:transparent;font-size:14px;font-weight:700;color:var(--text2);transition:all 0.3s;}
+.auth-tab.active{background:var(--green);color:#fff;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;font-size:14px;transition:border 0.2s;background:#f9fffe;}
+.form-group input:focus,.form-group select:focus{border-color:var(--green);}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(90deg,var(--green),var(--green-dark));color:#fff;border-radius:14px;font-size:16px;font-weight:800;margin-top:8px;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 16px rgba(34,197,94,0.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(34,197,94,0.4);}
+.forgot-link{text-align:center;margin-top:14px;font-size:13px;color:var(--green-dark);cursor:pointer;font-weight:700;}
+.forgot-link:hover{text-decoration:underline;}
+.lang-select-auth{display:flex;justify-content:center;gap:10px;margin-bottom:20px;}
+.lang-btn{padding:6px 16px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:700;background:#fff;color:var(--text2);transition:all 0.2s;}
+.lang-btn.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+/* ===== MAIN APP ===== */
+#mainApp{display:none;padding-bottom:80px;}
+
+/* TOP NAV */
+.top-nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--border);padding:12px 16px;box-shadow:0 2px 12px rgba(34,197,94,0.1);}
+.nav-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.nav-logo{font-size:22px;font-weight:900;color:var(--green-dark);display:flex;align-items:center;gap:8px;}
+.nav-icons{display:flex;gap:12px;align-items:center;}
+.nav-icon-btn{width:38px;height:38px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;}
+.cart-badge{position:absolute;top:-4px;right:-4px;background:var(--orange);color:#fff;font-size:10px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.address-bar{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:12px;padding:10px 14px;border:2px solid var(--border);cursor:pointer;transition:border 0.2s;}
+.address-bar:hover{border-color:var(--green);}
+.address-text{font-size:13px;font-weight:700;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* SEARCH */
+.search-wrap{padding:12px 16px 0;}
+.search-box{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--border);border-radius:14px;padding:10px 16px;transition:border 0.2s;box-shadow:var(--shadow);}
+.search-box:focus-within{border-color:var(--green);}
+.search-box input{flex:1;border:none;background:transparent;font-size:15px;color:var(--text);}
+.search-btn{font-size:20px;background:none;}
+
+/* BANNER */
+.banner-wrap{padding:14px 16px 0;overflow:hidden;}
+.banner{background:linear-gradient(120deg,#16a34a,#22c55e);border-radius:20px;padding:22px 20px;color:#fff;position:relative;overflow:hidden;}
+.banner h2{font-size:22px;font-weight:900;margin-bottom:6px;}
+.banner p{font-size:13px;opacity:0.9;margin-bottom:14px;}
+.banner-btn{background:#fff;color:var(--green-dark);padding:8px 20px;border-radius:30px;font-weight:800;font-size:14px;display:inline-block;}
+.banner-emoji{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:64px;opacity:0.3;}
+.offer-chips{display:flex;gap:8px;margin-top:14px;overflow-x:auto;padding-bottom:4px;}
+.offer-chip{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;}
+
+/* CATEGORIES */
+.section-title{font-size:18px;font-weight:900;color:var(--text);padding:16px 16px 8px;display:flex;justify-content:space-between;align-items:center;}
+.see-all{font-size:13px;color:var(--green-dark);font-weight:700;cursor:pointer;}
+.cats-wrap{display:flex;gap:12px;overflow-x:auto;padding:4px 16px 12px;scrollbar-width:none;}
+.cats-wrap::-webkit-scrollbar{display:none;}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:72px;}
+.cat-icon{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;transition:transform 0.2s,box-shadow 0.2s;}
+.cat-item:hover .cat-icon,.cat-item.active .cat-icon{transform:scale(1.12);box-shadow:0 4px 16px rgba(34,197,94,0.3);}
+.cat-item.active .cat-icon{outline:3px solid var(--green);}
+.cat-name{font-size:12px;font-weight:700;color:var(--text2);text-align:center;}
+
+/* PRODUCTS */
+.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:0 16px 16px;}
+.product-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:transform 0.2s,box-shadow 0.2s;position:relative;}
+.product-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(34,197,94,0.18);}
+.product-media{position:relative;height:140px;overflow:hidden;}
+.product-media-slider{display:flex;height:100%;transition:transform 0.4s ease;}
+.product-media img,.product-media video{width:100%;height:140px;object-fit:cover;flex-shrink:0;}
+.media-dots{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;}
+.media-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);}
+.media-dot.active{background:#fff;}
+.swipe-hint{position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:18px;opacity:0.7;pointer-events:none;}
+.offer-tag{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:8px;}
+.product-info{padding:12px;}
+.product-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;}
+.product-unit{font-size:12px;color:var(--text2);}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.price-new{font-size:16px;font-weight:900;color:var(--green-dark);}
+.price-old{font-size:12px;color:#9ca3af;text-decoration:line-through;margin-left:4px;}
+.add-btn{width:30px;height:30px;border-radius:10px;background:var(--green);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;}
+.add-btn:hover{transform:scale(1.12);}
+.qty-ctrl{display:flex;align-items:center;gap:6px;}
+.qty-ctrl button{width:26px;height:26px;border-radius:8px;background:var(--bg);font-size:16px;font-weight:700;}
+.qty-ctrl span{font-size:14px;font-weight:800;min-width:20px;text-align:center;}
+
+/* CART PANEL */
+#cartPanel{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.4);}
+.cart-drawer{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;padding:20px 16px 30px;}
+.cart-handle{width:40px;height:4px;background:#e5e7eb;border-radius:10px;margin:0 auto 16px;}
+.cart-title{font-size:20px;font-weight:900;margin-bottom:16px;}
+.cart-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.cart-item img{width:56px;height:56px;border-radius:12px;object-fit:cover;}
+.cart-item-info{flex:1;}
+.cart-item-name{font-size:14px;font-weight:700;}
+.cart-item-price{font-size:13px;color:var(--green-dark);font-weight:800;}
+.cart-summary{padding:16px 0;}
+.summary-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;}
+.summary-total{font-size:18px;font-weight:900;color:var(--text);}
+.coupon-row{display:flex;gap:8px;margin:12px 0;}
+.coupon-row input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:12px;font-size:14px;}
+.coupon-row button{padding:10px 18px;background:var(--green);color:#fff;border-radius:12px;font-weight:700;font-size:14px;}
+.payment-type{display:flex;gap:10px;margin:12px 0;}
+.pay-type-btn{flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);font-size:13px;font-weight:700;background:#fff;transition:all 0.2s;}
+.pay-type-btn.active{border-color:var(--green);background:var(--green-light);color:var(--green-dark);}
+
+/* ADDRESS MODAL */
+#addressModal{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.45);}
+.modal-box{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 30px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:16px;}
+.loc-btn{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--bg);border-radius:14px;border:2px solid var(--green);width:100%;margin-bottom:14px;font-size:14px;font-weight:700;color:var(--green-dark);}
+
+/* PAYMENT SCREEN */
+#paymentScreen{display:none;position:fixed;inset:0;z-index:700;background:var(--bg);overflow-y:auto;padding:20px;}
+.payment-card{max-width:440px;margin:0 auto;background:#fff;border-radius:24px;padding:28px;box-shadow:var(--shadow);}
+.payment-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:20px;}
+.upi-box{background:var(--bg);border-radius:16px;padding:18px;text-align:center;border:2px dashed var(--green);margin-bottom:16px;}
+.upi-id{font-size:17px;font-weight:800;color:var(--green-dark);}
+.upi-label{font-size:13px;color:var(--text2);margin-bottom:6px;}
+.pay-apps{display:flex;gap:10px;justify-content:center;margin:16px 0;}
+.pay-app{background:#fff;border:2px solid var(--border);border-radius:14px;padding:12px 18px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;transition:all 0.2s;}
+.pay-app:hover{border-color:var(--green);background:var(--bg);}
+.passkey-box{margin:16px 0;}
+.passkey-box input{width:100%;padding:14px;border:2px solid var(--border);border-radius:14px;font-size:20px;text-align:center;letter-spacing:8px;font-weight:800;}
+.order-success{display:none;text-align:center;padding:20px 0;}
+.success-icon{font-size:72px;animation:pulse 1s infinite alternate;}
+@keyframes pulse{from{transform:scale(1);}to{transform:scale(1.1);}}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid var(--border);display:flex;z-index:200;padding:8px 0;}
+.bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;padding:4px 0;}
+.bottom-nav-item.active{color:var(--green-dark);}
+.bottom-nav-item span:first-child{font-size:22px;}
+
+/* ADMIN PANEL */
+#adminPanel{display:none;position:fixed;inset:0;z-index:800;background:#f8fffe;overflow-y:auto;}
+.admin-header{background:linear-gradient(90deg,#16a34a,#22c55e);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between;}
+.admin-header h1{font-size:20px;font-weight:900;}
+.admin-tabs{display:flex;gap:4px;overflow-x:auto;padding:12px 16px;background:#fff;border-bottom:2px solid var(--border);}
+.admin-tab{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;background:var(--bg);color:var(--text2);white-space:nowrap;transition:all 0.2s;}
+.admin-tab.active{background:var(--green);color:#fff;}
+.admin-content{padding:16px;}
+.admin-card{background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.admin-card h3{font-size:16px;font-weight:800;margin-bottom:14px;color:var(--green-dark);}
+.admin-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.admin-form input,.admin-form select,.admin-form textarea{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:12px;font-size:14px;}
+.admin-form input:focus,.admin-form select:focus,.admin-form textarea:focus{border-color:var(--green);}
+.btn-green{padding:10px 22px;background:var(--green);color:#fff;border-radius:12px;font-weight:700;font-size:14px;margin-right:8px;}
+.btn-red{padding:10px 22px;background:var(--red);color:#fff;border-radius:12px;font-weight:700;font-size:14px;}
+.btn-orange{padding:10px 22px;background:var(--orange);color:#fff;border-radius:12px;font-weight:700;font-size:14px;}
+.order-row{background:var(--bg);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid var(--green);}
+.order-row.pending{border-left-color:var(--yellow);}
+.order-row.delivered{border-left-color:var(--green);}
+.order-row.assigned{border-left-color:var(--orange);}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;}
+.badge-pending{background:#fef3c7;color:#92400e;}
+.badge-assigned{background:#fed7aa;color:#9a3412;}
+.badge-delivered{background:#bbf7d0;color:#166534;}
+.badge-cod{background:#e0e7ff;color:#3730a3;}
+.badge-prepaid{background:#fce7f3;color:#9d174d;}
+.photo-upload-area{border:2px dashed var(--green);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:background 0.2s;}
+.photo-upload-area:hover{background:var(--green-light);}
+.photo-preview-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.photo-thumb{width:70px;height:70px;border-radius:10px;object-fit:cover;border:2px solid var(--border);}
+.code-editor{background:#1a1a2e;border-radius:14px;padding:16px;margin-top:10px;}
+.code-editor textarea{width:100%;background:transparent;color:#7dd3fc;font-family:'Courier New',monospace;font-size:13px;border:none;resize:vertical;min-height:300px;line-height:1.6;}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+.stat-card{background:var(--bg);border-radius:14px;padding:16px;text-align:center;}
+.stat-num{font-size:28px;font-weight:900;color:var(--green-dark);}
+.stat-label{font-size:13px;color:var(--text2);font-weight:600;}
+
+/* DELIVERY BOY PANEL */
+#dbPanel{display:none;position:fixed;inset:0;z-index:800;background:#f0fdf4;overflow-y:auto;}
+.db-header{background:linear-gradient(90deg,#0369a1,#0ea5e9);padding:16px 20px;color:#fff;}
+.db-order{background:#fff;border-radius:16px;padding:16px;margin:10px 16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);}
+.deliver-btn{padding:10px 20px;background:var(--green);color:#fff;border-radius:12px;font-weight:700;font-size:14px;margin-top:10px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2e1a;color:#fff;padding:12px 24px;border-radius:30px;font-size:14px;font-weight:700;z-index:9000;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* FORGOT PASSWORD */
+#forgotModal{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,0.4);}
+
+/* LANGUAGE TOGGLE */
+.lang-toggle{display:flex;gap:8px;padding:12px 16px 0;}
+.lang-toggle button{padding:6px 14px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:700;background:#fff;transition:all 0.2s;}
+.lang-toggle button.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--green-light);border-radius:10px;}
+
+/* ORDERS PAGE */
+#ordersPage{display:none;padding:16px;}
+.order-history-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+
+/* INSTALL BUTTON */
+#installBtn{display:none;position:fixed;bottom:90px;right:16px;z-index:300;background:var(--green-dark);color:#fff;padding:12px 20px;border-radius:30px;font-size:14px;font-weight:800;box-shadow:0 4px 16px rgba(22,163,74,0.4);}
+
+/* RESPONSIVE */
+@media(min-width:600px){
+  .products-grid{grid-template-columns:repeat(3,1fr);}
+  #mainApp,#adminPanel,#dbPanel{max-width:600px;margin:0 auto;}
+  .bottom-nav{max-width:600px;left:50%;transform:translateX(-50%);}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" class="hide">
+  <div class="splash-logo">🛒</div>
+  <div class="splash-title">FreshMart</div>
+  <div class="splash-sub" id="splashSub">புதியது. வேகமானது. வழங்கப்பட்டது.</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen" style="display: none;">
+  <div class="auth-box">
+    <div class="auth-logo">🛒</div>
+    <div class="auth-title">FreshMart</div>
+    <div class="auth-sub" id="authSubText">தொடர உள்நுழையவும்</div>
+    <div class="lang-select-auth">
+      <button class="lang-btn" onclick="setLang('en',this)">English</button>
+      <button class="lang-btn active" onclick="setLang('ta',this)">தமிழ்</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab" onclick="switchAuthTab('login',this)" id="tabLogin">Login</button>
+      <button class="auth-tab" onclick="switchAuthTab('register',this)" id="tabRegister">Register</button>
+      <button class="auth-tab active" onclick="switchAuthTab('admin',this)" id="tabAdmin">Admin</button>
+      <button class="auth-tab" onclick="switchAuthTab('delivery',this)" id="tabDelivery">Delivery</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" style="display: none;">
+      <div class="form-group"><label id="lblEmail">Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label id="lblPass">Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doLogin()" id="btnLoginText">Login</button>
+      <div class="forgot-link" onclick="showForgot()" id="forgotText">Forgot Password?</div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" style="display: none;">
+      <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Your Name"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label>Phone</label><input type="tel" id="regPhone" placeholder="10-digit mobile"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Create password"></div>
+      <div class="form-group"><label>Address</label><textarea id="regAddress" rows="2" placeholder="Street, City, State"></textarea></div>
+      <button class="btn-primary" onclick="doRegister()">Create Account</button>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="adminForm" style="display: block;">
+      <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@freshmart.com"></div>
+      <div class="form-group"><label>Admin Password</label><input type="password" id="adminPass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doAdminLogin()">Admin Login</button>
+    </div>
+
+    <!-- DELIVERY LOGIN -->
+    <div id="deliveryForm" style="display: none;">
+      <div class="form-group"><label>Delivery Boy Email</label><input type="email" id="dbEmail" placeholder="delivery@freshmart.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="dbPass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doDeliveryLogin()">Delivery Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotModal">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 30px;">
+    <div class="modal-title">Reset Password</div>
+    <div class="form-group"><label>Mobile Number</label><input type="tel" id="forgotPhone" placeholder="enter your number"></div>
+    <div class="form-group"><label>New Password</label><input type="password" id="forgotNewPass" placeholder="New password"></div>
+    <button class="btn-primary" onclick="doForgot()">Reset Password</button>
+    <div class="forgot-link" onclick="closeForgot()" style="margin-top:10px;">Cancel</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display: none;">
+  <!-- TOP NAV -->
+  <div class="top-nav">
+    <div class="nav-row1">
+      <div class="nav-logo">🛒 ullangai sangai</div>
+      <div class="nav-icons">
+        <div class="lang-toggle" style="padding:0;">
+          <button onclick="setLang('en',this)" id="navLangEn" class="" style="padding:4px 10px;font-size:12px;">EN</button>
+          <button onclick="setLang('ta',this)" id="navLangTa" style="padding:4px 10px;font-size:12px;">த</button>
+        </div>
+        <div class="nav-icon-btn" onclick="openCart()" style="cursor:pointer;">🛒<span class="cart-badge" id="cartBadge">1</span></div>
+        <div class="nav-icon-btn" onclick="showOrders()" style="cursor:pointer;">📦</div>
+        <div class="nav-icon-btn" onclick="doLogout()" style="cursor:pointer;">👤</div>
+      </div>
+    </div>
+    <div class="address-bar" onclick="showAddressModal()">
+      <span>📍</span>
+      <span class="address-text" id="currentAddress">டெலிவரி முகவரி சேர்க்கவும்</span>
+      <span style="font-size:12px;color:#9ca3af;">▼</span>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="காய்கறிகள், பழங்கள் தேடுங்கள்..." oninput="searchProducts()">
+      <button class="search-btn" onclick="searchProducts()">→</button>
+    </div>
+  </div>
+
+  <!-- BANNER -->
+  <div class="banner-wrap">
+    <div class="banner">
+      <div class="banner-emoji">🥦</div>
+      <h2 id="bannerTitle">புதியதும் இயற்கையும் 🌿</h2>
+      <p id="bannerText">முதல் ஆர்டரில் 20% தள்ளுபடி!</p>
+      <span class="banner-btn" id="bannerBtn">Shop Now</span>
+      <div class="offer-chips">
+        <span class="offer-chip">FRESH20 - 20% off</span>
+        <span class="offer-chip">FIRST50 - ₹50 off</span>
+        <span class="offer-chip">FREE delivery on ₹499+</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section-title"><span id="catTitle">வகைகள்</span></div>
+  <div class="cats-wrap" id="catsWrap">
+    <div class="cat-item active" onclick="filterCategory('all')">
+      <div class="cat-icon" style="background:#f0fdf4">🛒</div>
+      <div class="cat-name">அனைத்தும்</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('grocery')">
+      <div class="cat-icon" style="background:#fff7ed">🛍️</div>
+      <div class="cat-name">மளிகை</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('fruits')">
+      <div class="cat-icon" style="background:#fef2f2">🍎</div>
+      <div class="cat-name">பழங்கள்</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('vegetables')">
+      <div class="cat-icon" style="background:#f0fdf4">🥦</div>
+      <div class="cat-name">காய்கறிகள்</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('dairy')">
+      <div class="cat-icon" style="background:#eff6ff">🥛</div>
+      <div class="cat-name">பால் பொருட்கள்</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('bakery')">
+      <div class="cat-icon" style="background:#fffbeb">🍞</div>
+      <div class="cat-name">பேக்கரி</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('snacks')">
+      <div class="cat-icon" style="background:#fdf4ff">🍿</div>
+      <div class="cat-name">சிற்றுண்டி</div>
+    </div>
+  
+    <div class="cat-item " onclick="filterCategory('beverages')">
+      <div class="cat-icon" style="background:#ecfeff">🧃</div>
+      <div class="cat-name">பானங்கள்</div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="section-title"><span id="prodTitle">அனைத்து பொருட்கள்</span><span class="see-all" onclick="filterCategory('all')">See All</span></div>
+  <div class="products-grid" id="productsGrid" style="display: grid;">
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,1)" ontouchend="swipeEnd(event,1)">
+        <div class="product-media-slider" id="slider_1">
+          <img src="https://via.placeholder.com/300x140?text=FreshMart" alt="Fresh Tomatoes" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">27% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Fresh Tomatoes</div>
+        <div class="product-unit">1 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹40</span><span class="price-old">₹55</span></div>
+          <button class="add-btn" onclick="addToCart(1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,2)" ontouchend="swipeEnd(event,2)">
+        <div class="product-media-slider" id="slider_2">
+          <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400" alt="Basmati Rice" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">20% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Basmati Rice</div>
+        <div class="product-unit">2 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹120</span><span class="price-old">₹150</span></div>
+          <button class="add-btn" onclick="addToCart(2)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,3)" ontouchend="swipeEnd(event,3)">
+        <div class="product-media-slider" id="slider_3">
+          <img src="https://images.unsplash.com/photo-1553279768-865429fa0078?w=400" alt="Alphonso Mangoes" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">20% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Alphonso Mangoes</div>
+        <div class="product-unit">1 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹199</span><span class="price-old">₹249</span></div>
+          <button class="add-btn" onclick="addToCart(3)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,4)" ontouchend="swipeEnd(event,4)">
+        <div class="product-media-slider" id="slider_4">
+          <img src="https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400" alt="Organic Spinach" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">25% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Organic Spinach</div>
+        <div class="product-unit">500 g</div>
+        <div class="price-row">
+          <div><span class="price-new">₹30</span><span class="price-old">₹40</span></div>
+          <button class="add-btn" onclick="addToCart(4)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,5)" ontouchend="swipeEnd(event,5)">
+        <div class="product-media-slider" id="slider_5">
+          <img src="https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400" alt="Full Cream Milk" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">7% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Full Cream Milk</div>
+        <div class="product-unit">1 litre</div>
+        <div class="price-row">
+          <div><span class="price-new">₹65</span><span class="price-old">₹70</span></div>
+          <button class="add-btn" onclick="addToCart(5)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,6)" ontouchend="swipeEnd(event,6)">
+        <div class="product-media-slider" id="slider_6">
+          <img src="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400" alt="Brown Eggs" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">10% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Brown Eggs</div>
+        <div class="product-unit">12 pcs</div>
+        <div class="price-row">
+          <div><span class="price-new">₹90</span><span class="price-old">₹100</span></div>
+          <button class="add-btn" onclick="addToCart(6)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,7)" ontouchend="swipeEnd(event,7)">
+        <div class="product-media-slider" id="slider_7">
+          <img src="https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=400" alt="Red Apples" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">17% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Red Apples</div>
+        <div class="product-unit">1 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹150</span><span class="price-old">₹180</span></div>
+          <button class="add-btn" onclick="addToCart(7)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,8)" ontouchend="swipeEnd(event,8)">
+        <div class="product-media-slider" id="slider_8">
+          <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400" alt="Wheat Flour" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">17% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Wheat Flour</div>
+        <div class="product-unit">5 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹75</span><span class="price-old">₹90</span></div>
+          <button class="add-btn" onclick="addToCart(8)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,9)" ontouchend="swipeEnd(event,9)">
+        <div class="product-media-slider" id="slider_9">
+          <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=400" alt="Fresh Onions" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">30% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Fresh Onions</div>
+        <div class="product-unit">1 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹35</span><span class="price-old">₹50</span></div>
+          <button class="add-btn" onclick="addToCart(9)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,10)" ontouchend="swipeEnd(event,10)">
+        <div class="product-media-slider" id="slider_10">
+          <img src="https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400" alt="Banana Bunch" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">17% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Banana Bunch</div>
+        <div class="product-unit">1 bunch</div>
+        <div class="price-row">
+          <div><span class="price-new">₹50</span><span class="price-old">₹60</span></div>
+          <button class="add-btn" onclick="addToCart(10)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,11)" ontouchend="swipeEnd(event,11)">
+        <div class="product-media-slider" id="slider_11">
+          <img src="https://images.unsplash.com/photo-1452195100486-9cc805987862?w=400" alt="Cheddar Cheese" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">18% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Cheddar Cheese</div>
+        <div class="product-unit">200 g</div>
+        <div class="price-row">
+          <div><span class="price-new">₹180</span><span class="price-old">₹220</span></div>
+          
+          <div class="qty-ctrl">
+            <button onclick="changeQty(11,-1)">−</button>
+            <span>1</span>
+            <button onclick="changeQty(11,1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,12)" ontouchend="swipeEnd(event,12)">
+        <div class="product-media-slider" id="slider_12">
+          <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400" alt="Toor Dal" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">
+          
+        </div>
+        <div class="offer-tag">15% OFF</div>
+        
+        
+      </div>
+      <div class="product-info">
+        <div class="product-name">Toor Dal</div>
+        <div class="product-unit">1 kg</div>
+        <div class="price-row">
+          <div><span class="price-new">₹110</span><span class="price-old">₹130</span></div>
+          <button class="add-btn" onclick="addToCart(12)">+</button>
+        </div>
+      </div>
+    </div></div>
+
+  <!-- ORDERS PAGE -->
+  <div id="ordersPage" style="display: none;"></div>
+</div>
+
+<!-- ADDRESS MODAL -->
+<div id="addressModal" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-title">📍 Delivery Address</div>
+    <button class="loc-btn" onclick="useCurrentLocation()">📡 Use My Current Location</button>
+    <div class="form-group"><label>Door No / Flat</label><input type="text" id="addrDoor" placeholder="Flat 4B, Rose Apartments"></div>
+    <div class="form-group"><label>Street</label><input type="text" id="addrStreet" placeholder="Anna Salai"></div>
+    <div class="form-group"><label>Landmark</label><input type="text" id="addrLandmark" placeholder="Near Big Bazaar"></div>
+    <div class="form-group"><label>City</label><input type="text" id="addrCity" placeholder="Salem"></div>
+    <div class="form-group"><label>State</label><input type="text" id="addrState" placeholder="Tamil Nadu"></div>
+    <div class="form-group"><label>PIN Code</label><input type="text" id="addrPin" placeholder="636001"></div>
+    <button class="btn-primary" onclick="saveAddress()">Save Address</button>
+  </div>
+</div>
+
+<!-- CART PANEL -->
+<div id="cartPanel" onclick="closeCart(event)" style="display: none;">
+  <div class="cart-drawer" onclick="event.stopPropagation()">
+    <div class="cart-handle"></div>
+    <div class="cart-title">🛒 My Cart</div>
+    <div id="cartItems">
+    <div class="cart-item">
+      <img src="https://images.unsplash.com/photo-1452195100486-9cc805987862?w=400" alt="Cheddar Cheese" onerror="this.src='https://via.placeholder.com/56?text=🛒'">
+      <div class="cart-item-info">
+        <div class="cart-item-name">Cheddar Cheese</div>
+        <div style="font-size:12px;color:#9ca3af;">200 g</div>
+        <div class="cart-item-price">₹180 × 1 = ₹180</div>
+      </div>
+      <div class="qty-ctrl">
+        <button onclick="changeQty(11,-1)">−</button>
+        <span>1</span>
+        <button onclick="changeQty(11,1)">+</button>
+      </div>
+    </div></div>
+    <div class="cart-summary" id="cartSummary">
+    <div class="summary-row"><span>Subtotal</span><span>₹180</span></div>
+    <div class="summary-row"><span>Delivery</span><span>₹40</span></div>
+    <div class="summary-row" style="color:var(--green)"><span>Discount</span><span>-₹90</span></div>
+    <div class="summary-row summary-total"><span>Total</span><span>₹130</span></div>
+    <div style="font-size:12px;color:#9ca3af;margin-top:4px;">Payment: <b>💳 Prepaid (Online)</b></div></div>
+    <div class="coupon-row">
+      <input type="text" id="couponInput" placeholder="Enter offer code (FRESH20, FIRST50)">
+      <button onclick="applyCoupon()">Apply</button>
+    </div>
+    <div style="margin:10px 0 6px;font-size:13px;font-weight:700;">Payment Method</div>
+    <div class="payment-type">
+      <button class="pay-type-btn active" id="btnPrepaid" onclick="setPayType('prepaid',this)">💳 Prepaid (Online)</button>
+      <button class="pay-type-btn" id="btnCOD" onclick="setPayType('cod',this)">💵 Postpaid (COD)</button>
+    </div>
+    <button class="btn-primary" onclick="placeOrder()" id="checkoutBtn">Proceed to Buy</button>
+  </div>
+</div>
+
+<!-- PAYMENT SCREEN -->
+<div id="paymentScreen">
+  <div class="payment-card">
+    <div style="text-align:center;font-size:40px;margin-bottom:8px;">💳</div>
+    <div class="payment-title" id="payTitle">Complete Payment</div>
+    <div class="upi-box">
+      <div class="upi-label">Pay to UPI ID</div>
+      <div class="upi-id" id="displayUpiId">6380777399@ptaxis</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:6px;">FreshMart Payments</div>
+    </div>
+    <div style="text-align:center;font-size:22px;font-weight:900;color:var(--green-dark);margin:8px 0;" id="payAmount">₹0</div>
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:12px;">Choose your payment app:</div>
+    <div class="pay-apps">
+      <button class="pay-app" onclick="openPayApp('phonepe')">📱 PhonePe</button>
+      <button class="pay-app" onclick="openPayApp('paytm')">🪙 Paytm</button>
+      <button class="pay-app" onclick="openPayApp('gpay')">🔵 GPay</button>
+    </div>
+    <div class="passkey-box">
+      <label style="font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:8px;">Enter Passkey / UPI PIN</label>
+      <input type="password" id="passkeyInput" placeholder="••••" maxlength="6">
+    </div>
+    <button class="btn-primary" onclick="confirmPayment()">Confirm Payment ✓</button>
+    <button style="width:100%;padding:12px;background:#f3f4f6;border-radius:14px;font-size:14px;font-weight:700;margin-top:10px;" onclick="closePayment()">Cancel</button>
+    <div class="order-success" id="orderSuccess">
+      <div class="success-icon">✅</div>
+      <div style="font-size:22px;font-weight:900;color:var(--green-dark);margin-top:10px;" id="successTitle">Order Placed!</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:6px;" id="successMsg">Your order has been confirmed and details sent to admin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display: block;">
+  <div class="admin-header">
+    <h1>🛡️ Admin Panel</h1>
+    <button onclick="closeAdmin()" style="background:rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:10px;font-weight:700;">✕ Close</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab" onclick="adminTab('dashboard',this)">📊 Dashboard</button>
+    <button class="admin-tab" onclick="adminTab('orders',this)">📦 Orders</button>
+    <button class="admin-tab" onclick="adminTab('products',this)">🛍️ Products</button>
+    <button class="admin-tab" onclick="adminTab('delivery',this)">🚴 Delivery</button>
+    <button class="admin-tab" onclick="adminTab('customers',this)">👥 Customers</button>
+    <button class="admin-tab" onclick="adminTab('settings',this)">⚙️ Settings</button>
+    <button class="admin-tab active" onclick="adminTab('code',this)">💻 Source Code</button>
+  </div>
+  <div class="admin-content" id="adminContent">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">2</div><div class="stat-label">Total Orders</div></div>
+    <div class="stat-card"><div class="stat-num">1</div><div class="stat-label">Customers</div></div>
+    <div class="stat-card"><div class="stat-num">₹334</div><div class="stat-label">Revenue</div></div>
+    <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">Products</div></div>
+  </div>
+  <div class="admin-card"><h3>Recent Orders</h3>
+    
+      <div class="order-row assigned">
+        <div style="display:flex;justify-content:space-between"><b>ORD1778565649933</b><span class="status-badge badge-assigned">assigned</span></div>
+        <div style="font-size:13px;color:var(--text2)">venkat | 6380777399</div>
+        <div style="font-size:13px">₹199 | <span class="status-badge badge-prepaid">Prepaid (Online)</span></div>
+      </div>
+      <div class="order-row delivered">
+        <div style="display:flex;justify-content:space-between"><b>ORD1778565013836</b><span class="status-badge badge-delivered">delivered</span></div>
+        <div style="font-size:13px;color:var(--text2)">venkat | 6380777399</div>
+        <div style="font-size:13px">₹135 | <span class="status-badge badge-prepaid">Prepaid (Online)</span></div>
+      </div>
+  </div></div>
+</div>
+
+<!-- DELIVERY BOY PANEL -->
+<div id="dbPanel" style="display: none;">
+  <div class="db-header">
+    <h1 style="font-size:20px;font-weight:900;">🚴 Delivery Dashboard</h1>
+    <div style="font-size:14px;opacity:0.8;" id="dbName">👋 guru</div>
+  </div>
+  <div style="padding:16px;" id="dbContent"><div style="font-size:18px;font-weight:900;margin-bottom:14px;">My Deliveries</div>
+      <div class="db-order">
+        <div style="display:flex;justify-content:space-between"><b>ORD1778565649933</b><span class="status-badge badge-delivered">delivered</span></div>
+        <div style="font-size:14px;font-weight:700;margin:6px 0">venkat | 6380777399</div>
+        <div style="font-size:13px;color:var(--text2)">📍 sankarankovil</div>
+        <div style="font-size:13px;margin:6px 0">Basmati Rice x1, Alphonso Mangoes x1</div>
+        <div style="font-weight:800">₹199 | Prepaid (Online)</div>
+        <div style="color:var(--green);font-weight:700;margin-top:8px">✅ Delivered</div>
+      </div>
+      <div class="db-order">
+        <div style="display:flex;justify-content:space-between"><b>ORD1778565013836</b><span class="status-badge badge-delivered">delivered</span></div>
+        <div style="font-size:14px;font-weight:700;margin:6px 0">venkat | 6380777399</div>
+        <div style="font-size:13px;color:var(--text2)">📍 sankarankovil</div>
+        <div style="font-size:13px;margin:6px 0">Full Cream Milk x1, Organic Spinach x1</div>
+        <div style="font-weight:800">₹135 | Prepaid (Online)</div>
+        <div style="color:var(--green);font-weight:700;margin-top:8px">✅ Delivered</div>
+      </div></div>
+  <button onclick="closeDB()" style="margin:0 16px 20px;padding:12px;background:#ef4444;color:#fff;border-radius:14px;font-weight:700;font-size:14px;width:calc(100% - 32px);">Logout</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav" style="display: none;">
+  <div class="bottom-nav-item active" onclick="showHome()"><span>🏠</span><span id="navHome">முகப்பு</span></div>
+  <div class="bottom-nav-item" onclick="showOrders()"><span>📦</span><span id="navOrders">ஆர்டர்கள்</span></div>
+  <div class="bottom-nav-item" onclick="openCart()"><span>🛒</span><span id="navCart">கார்ட்</span></div>
+  <div class="bottom-nav-item" onclick="openAdminLogin()"><span>🛡️</span><span id="navAdmin">நிர்வாகி</span></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="">Order assigned!</div>
+
+<!-- INSTALL BTN -->
+<button id="installBtn" onclick="installApp()">📲 Install App</button>
+
+<script>
+// ============================================================
+// DATA STORAGE (localStorage for persistence)
+// ============================================================
+const DB = {
+  get(k){try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v));},
+  remove(k){localStorage.removeItem(k);}
+};
+
+// ============================================================
+// INITIAL DATA SETUP
+// ============================================================
+function initData(){
+  if(!DB.get('adminCreds')){
+    DB.set('adminCreds',{email:'eshwaranv159@gmail.com',password:'7397586610',phone:'6380777399',upiId:'6380777399@ptaxis'});
+  }
+  if(!DB.get('products')){
+    DB.set('products',[
+      {id:1,name:'Fresh Tomatoes',category:'vegetables',price:40,originalPrice:55,unit:'1 kg',offer:'27% OFF',photos:['https://images.unsplash.com/photo-1546094096-0df4bcabd337?w=400'],video:'',stock:100},
+      {id:2,name:'Basmati Rice',category:'grocery',price:120,originalPrice:150,unit:'2 kg',offer:'20% OFF',photos:['https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400'],video:'',stock:50},
+      {id:3,name:'Alphonso Mangoes',category:'fruits',price:199,originalPrice:249,unit:'1 kg',offer:'20% OFF',photos:['https://images.unsplash.com/photo-1553279768-865429fa0078?w=400'],video:'',stock:80},
+      {id:4,name:'Organic Spinach',category:'vegetables',price:30,originalPrice:40,unit:'500 g',offer:'25% OFF',photos:['https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400'],video:'',stock:60},
+      {id:5,name:'Full Cream Milk',category:'dairy',price:65,originalPrice:70,unit:'1 litre',offer:'7% OFF',photos:['https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400'],video:'',stock:200},
+      {id:6,name:'Brown Eggs',category:'dairy',price:90,originalPrice:100,unit:'12 pcs',offer:'10% OFF',photos:['https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400'],video:'',stock:150},
+      {id:7,name:'Red Apples',category:'fruits',price:150,originalPrice:180,unit:'1 kg',offer:'17% OFF',photos:['https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=400'],video:'',stock:90},
+      {id:8,name:'Wheat Flour',category:'grocery',price:75,originalPrice:90,unit:'5 kg',offer:'17% OFF',photos:['https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400'],video:'',stock:120},
+      {id:9,name:'Fresh Onions',category:'vegetables',price:35,originalPrice:50,unit:'1 kg',offer:'30% OFF',photos:['https://images.unsplash.com/photo-1508747703725-719777637510?w=400'],video:'',stock:200},
+      {id:10,name:'Banana Bunch',category:'fruits',price:50,originalPrice:60,unit:'1 bunch',offer:'17% OFF',photos:['https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400'],video:'',stock:100},
+      {id:11,name:'Cheddar Cheese',category:'dairy',price:180,originalPrice:220,unit:'200 g',offer:'18% OFF',photos:['https://images.unsplash.com/photo-1452195100486-9cc805987862?w=400'],video:'',stock:40},
+      {id:12,name:'Toor Dal',category:'grocery',price:110,originalPrice:130,unit:'1 kg',offer:'15% OFF',photos:['https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400'],video:'',stock:80}
+    ]);
+  }
+  if(!DB.get('users')) DB.set('users',[]);
+  if(!DB.get('deliveryBoys')) DB.set('deliveryBoys',[
+    {id:1,name:'Ravi Kumar',email:'ravi@freshmart.com',password:'ravi123',phone:'9876543210'},
+    {id:2,name:'Senthil',email:'senthil@freshmart.com',password:'senthil123',phone:'8765432109'}
+  ]);
+  if(!DB.get('orders')) DB.set('orders',[]);
+  if(!DB.get('cart')) DB.set('cart',[]);
+  if(!DB.get('offers')) DB.set('offers',{FRESH20:20,FIRST50:50,SAVE10:10});
+  if(!DB.get('deliveryCharge')) DB.set('deliveryCharge',40);
+  if(!DB.get('freeDeliveryAbove')) DB.set('freeDeliveryAbove',499);
+  if(!DB.get('appLang')) DB.set('appLang','en');
+}
+
+// ============================================================
+// LANGUAGE
+// ============================================================
+const LANG = {
+  en:{
+    splash:'Fresh. Fast. Delivered.',
+    signin:'Sign in to continue shopping',
+    home:'Home',orders:'Orders',cart:'Cart',admin:'Admin',
+    categories:'Categories',products:'All Products',seeAll:'See All',
+    searchPlaceholder:'Search groceries, fruits, veggies...',
+    bannerTitle:'Fresh & Organic 🌿',bannerText:'Get 20% off on your first order!',
+    addAddress:'Tap to set delivery address',
+  },
+  ta:{
+    splash:'புதியது. வேகமானது. வழங்கப்பட்டது.',
+    signin:'தொடர உள்நுழையவும்',
+    home:'முகப்பு',orders:'ஆர்டர்கள்',cart:'கார்ட்',admin:'நிர்வாகி',
+    categories:'வகைகள்',products:'அனைத்து பொருட்கள்',seeAll:'அனைத்தும்',
+    searchPlaceholder:'காய்கறிகள், பழங்கள் தேடுங்கள்...',
+    bannerTitle:'புதியதும் இயற்கையும் 🌿',bannerText:'முதல் ஆர்டரில் 20% தள்ளுபடி!',
+    addAddress:'டெலிவரி முகவரி சேர்க்கவும்',
+  }
+};
+let currentLang = DB.get('appLang') || 'en';
+
+function t(k){return (LANG[currentLang]||LANG.en)[k] || k;}
+
+function setLang(lang, btn){
+  currentLang = lang;
+  DB.set('appLang',lang);
+  document.querySelectorAll('.lang-btn,.lang-toggle button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  applyLang();
+}
+
+function applyLang(){
+  const el = (id,txt)=>{const e=document.getElementById(id);if(e)e.textContent=txt;};
+  el('splashSub',t('splash'));
+  el('authSubText',t('signin'));
+  el('navHome',t('home'));el('navOrders',t('orders'));el('navCart',t('cart'));el('navAdmin',t('admin'));
+  el('catTitle',t('categories'));el('prodTitle',t('products'));
+  const si = document.getElementById('searchInput');
+  if(si) si.placeholder = t('searchPlaceholder');
+  el('bannerTitle',t('bannerTitle'));el('bannerText',t('bannerText'));
+  const addr = DB.get('currentUser');
+  if(!addr || !addr.deliveryAddress) el('currentAddress',t('addAddress'));
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+const CATEGORIES = [
+  {id:'all',name:{en:'All',ta:'அனைத்தும்'},icon:'🛒',bg:'#f0fdf4'},
+  {id:'grocery',name:{en:'Grocery',ta:'மளிகை'},icon:'🛍️',bg:'#fff7ed'},
+  {id:'fruits',name:{en:'Fruits',ta:'பழங்கள்'},icon:'🍎',bg:'#fef2f2'},
+  {id:'vegetables',name:{en:'Vegetables',ta:'காய்கறிகள்'},icon:'🥦',bg:'#f0fdf4'},
+  {id:'dairy',name:{en:'Dairy',ta:'பால் பொருட்கள்'},icon:'🥛',bg:'#eff6ff'},
+  {id:'bakery',name:{en:'Bakery',ta:'பேக்கரி'},icon:'🍞',bg:'#fffbeb'},
+  {id:'snacks',name:{en:'Snacks',ta:'சிற்றுண்டி'},icon:'🍿',bg:'#fdf4ff'},
+  {id:'beverages',name:{en:'Beverages',ta:'பானங்கள்'},icon:'🧃',bg:'#ecfeff'}
+];
+
+let selectedCat = 'all';
+let cart = DB.get('cart') || [];
+
+// ============================================================
+// RENDER CATEGORIES
+// ============================================================
+function renderCategories(){
+  const w = document.getElementById('catsWrap');
+  if(!w) return;
+  w.innerHTML = CATEGORIES.map(c=>`
+    <div class="cat-item ${selectedCat===c.id?'active':''}" onclick="filterCategory('${c.id}')">
+      <div class="cat-icon" style="background:${c.bg}">${c.icon}</div>
+      <div class="cat-name">${c.name[currentLang]||c.name.en}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// RENDER PRODUCTS
+// ============================================================
+function renderProducts(prods){
+  const g = document.getElementById('productsGrid');
+  if(!g) return;
+  if(!prods || !prods.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af;">No products found</div>';return;}
+  g.innerHTML = prods.map(p=>{
+    const inCart = cart.find(c=>c.id===p.id);
+    const photos = p.photos||[];
+    const hasMulti = photos.length > 1 || p.video;
+    return `
+    <div class="product-card">
+      <div class="product-media" ontouchstart="swipeStart(event,${p.id})" ontouchend="swipeEnd(event,${p.id})">
+        <div class="product-media-slider" id="slider_${p.id}">
+          ${photos.map(ph=>`<img src="${ph}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140?text=FreshMart'">`).join('')}
+          ${p.video?`<video src="${p.video}" loop muted playsinline style="width:100%;height:140px;object-fit:cover;flex-shrink:0;"></video>`:''}
+        </div>
+        ${p.offer?`<div class="offer-tag">${p.offer}</div>`:''}
+        ${hasMulti?`<span class="swipe-hint">👉</span>`:''}
+        ${photos.length>1||p.video?`<div class="media-dots">${[...Array(photos.length+(p.video?1:0))].map((_,i)=>`<div class="media-dot ${i===0?'active':''}" id="dot_${p.id}_${i}"></div>`).join('')}</div>`:''}
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-unit">${p.unit}</div>
+        <div class="price-row">
+          <div><span class="price-new">₹${p.price}</span>${p.originalPrice?`<span class="price-old">₹${p.originalPrice}</span>`:''}</div>
+          ${inCart?`
+          <div class="qty-ctrl">
+            <button onclick="changeQty(${p.id},-1)">−</button>
+            <span>${inCart.qty}</span>
+            <button onclick="changeQty(${p.id},1)">+</button>
+          </div>`:`<button class="add-btn" onclick="addToCart(${p.id})">+</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// SWIPE FOR MEDIA
+// ============================================================
+let swipeStartX = {};
+let currentSlide = {};
+function swipeStart(e,id){swipeStartX[id] = e.touches[0].clientX;}
+function swipeEnd(e,id){
+  if(swipeStartX[id]===undefined) return;
+  const dx = e.changedTouches[0].clientX - swipeStartX[id];
+  const prods = DB.get('products')||[];
+  const p = prods.find(x=>x.id===id);
+  if(!p) return;
+  const total = (p.photos||[]).length + (p.video?1:0);
+  if(total<2) return;
+  if(!currentSlide[id]) currentSlide[id]=0;
+  if(dx < -40) currentSlide[id] = Math.min(currentSlide[id]+1, total-1);
+  else if(dx > 40) currentSlide[id] = Math.max(currentSlide[id]-1, 0);
+  const slider = document.getElementById('slider_'+id);
+  if(slider) slider.style.transform=`translateX(-${currentSlide[id]*100}%)`;
+  document.querySelectorAll(`[id^='dot_${id}_']`).forEach((d,i)=>{d.classList.toggle('active',i===currentSlide[id]);});
+}
+
+// ============================================================
+// FILTER & SEARCH
+// ============================================================
+function filterCategory(cat){
+  selectedCat = cat;
+  renderCategories();
+  const prods = DB.get('products')||[];
+  const filtered = cat==='all'?prods:prods.filter(p=>p.category===cat);
+  renderProducts(filtered);
+  document.getElementById('ordersPage').style.display='none';
+  document.getElementById('productsGrid').style.display='grid';
+}
+
+function searchProducts(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const prods = DB.get('products')||[];
+  const filtered = q?prods.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)):prods;
+  renderProducts(filtered);
+}
+
+// ============================================================
+// CART
+// ============================================================
+function addToCart(id){
+  const prods = DB.get('products')||[];
+  const p = prods.find(x=>x.id===id);
+  if(!p) return;
+  cart = DB.get('cart')||[];
+  const ex = cart.find(c=>c.id===id);
+  if(ex) ex.qty++;
+  else cart.push({id:p.id,name:p.name,price:p.price,photos:p.photos,unit:p.unit,qty:1});
+  DB.set('cart',cart);
+  updateCartBadge();
+  filterCategory(selectedCat);
+  showToast(currentLang==='ta'?'கார்ட்டில் சேர்க்கப்பட்டது ✓':'Added to cart ✓');
+}
+
+function changeQty(id,d){
+  cart = DB.get('cart')||[];
+  const idx = cart.findIndex(c=>c.id===id);
+  if(idx===-1) return;
+  cart[idx].qty += d;
+  if(cart[idx].qty<=0) cart.splice(idx,1);
+  DB.set('cart',cart);
+  updateCartBadge();
+  filterCategory(selectedCat);
+  renderCartPanel();
+}
+
+function updateCartBadge(){
+  cart = DB.get('cart')||[];
+  const b = document.getElementById('cartBadge');
+  if(b) b.textContent = cart.reduce((a,c)=>a+c.qty,0);
+}
+
+function openCart(){document.getElementById('cartPanel').style.display='block';renderCartPanel();}
+function closeCart(e){if(e.target===document.getElementById('cartPanel'))document.getElementById('cartPanel').style.display='none';}
+
+function renderCartPanel(){
+  cart = DB.get('cart')||[];
+  const el = document.getElementById('cartItems');
+  if(!cart.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#9ca3af;">Your cart is empty 🛒</div>';document.getElementById('cartSummary').innerHTML='';return;}
+  el.innerHTML = cart.map(c=>`
+    <div class="cart-item">
+      <img src="${(c.photos&&c.photos[0])||'https://via.placeholder.com/56?text=🛒'}" alt="${c.name}" onerror="this.src='https://via.placeholder.com/56?text=🛒'">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.name}</div>
+        <div style="font-size:12px;color:#9ca3af;">${c.unit}</div>
+        <div class="cart-item-price">₹${c.price} × ${c.qty} = ₹${c.price*c.qty}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button onclick="changeQty(${c.id},-1)">−</button>
+        <span>${c.qty}</span>
+        <button onclick="changeQty(${c.id},1)">+</button>
+      </div>
+    </div>`).join('');
+  calcCart();
+}
+
+let discount = 0, payType = 'prepaid';
+function setPayType(t,btn){
+  payType=t;
+  document.querySelectorAll('.pay-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  calcCart();
+}
+
+function calcCart(){
+  cart = DB.get('cart')||[];
+  const sub = cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const dc = sub>=(DB.get('freeDeliveryAbove')||499)?0:(DB.get('deliveryCharge')||40);
+  const total = sub + dc - discount;
+  const sumEl = document.getElementById('cartSummary');
+  if(!sumEl) return;
+  sumEl.innerHTML=`
+    <div class="summary-row"><span>Subtotal</span><span>₹${sub}</span></div>
+    <div class="summary-row"><span>Delivery</span><span>${dc===0?'<span style="color:var(--green)">FREE</span>':'₹'+dc}</span></div>
+    ${discount?`<div class="summary-row" style="color:var(--green)"><span>Discount</span><span>-₹${discount}</span></div>`:''}
+    <div class="summary-row summary-total"><span>Total</span><span>₹${total}</span></div>
+    <div style="font-size:12px;color:#9ca3af;margin-top:4px;">Payment: <b>${payType==='prepaid'?'💳 Prepaid (Online)':'💵 Postpaid (COD)'}</b></div>`;
+  return total;
+}
+
+function applyCoupon(){
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const offers = DB.get('offers')||{};
+  const sub = (DB.get('cart')||[]).reduce((a,c)=>a+c.price*c.qty,0);
+  if(offers[code]!==undefined){
+    const v = offers[code];
+    if(v>100) discount=v;
+    else discount = Math.round(sub*v/100);
+    showToast(`Coupon applied! ₹${discount} discount`);
+    calcCart();
+  } else showToast('Invalid coupon code');
+}
+
+// ============================================================
+// ORDER PLACEMENT
+// ============================================================
+function placeOrder(){
+  cart = DB.get('cart')||[];
+  if(!cart.length){showToast('Cart is empty!');return;}
+  const user = DB.get('currentUser');
+  if(!user){showToast('Please login first!');return;}
+  if(!user.deliveryAddress){showToast('Please set delivery address!');closeCart({target:null});showAddressModal();return;}
+  if(!payType){showToast('Please select payment method!');return;}
+  if(payType==='prepaid'){
+    document.getElementById('cartPanel').style.display='none';
+    openPaymentScreen();
+  } else {
+    completeCODOrder();
+  }
+}
+
+function openPaymentScreen(){
+  const sub = (DB.get('cart')||[]).reduce((a,c)=>a+c.price*c.qty,0);
+  const dc = sub>=(DB.get('freeDeliveryAbove')||499)?0:(DB.get('deliveryCharge')||40);
+  const total = sub + dc - discount;
+  document.getElementById('payAmount').textContent='₹'+total;
+  document.getElementById('displayUpiId').textContent=(DB.get('adminCreds')||{}).upiId||'6380777399@ptaxis';
+  document.getElementById('paymentScreen').style.display='block';
+  document.getElementById('orderSuccess').style.display='none';
+  document.getElementById('paymentScreen').scrollTop=0;
+}
+
+function openPayApp(app){
+  const upi = (DB.get('adminCreds')||{}).upiId||'6380777399@ptaxis';
+  const sub = (DB.get('cart')||[]).reduce((a,c)=>a+c.price*c.qty,0);
+  const dc = sub>=(DB.get('freeDeliveryAbove')||499)?0:(DB.get('deliveryCharge')||40);
+  const total = sub + dc - discount;
+  const urls = {
+    phonepe:`phonepe://pay?pa=${upi}&am=${total}&cu=INR`,
+    paytm:`paytmmp://pay?pa=${upi}&am=${total}&cu=INR`,
+    gpay:`tez://upi/pay?pa=${upi}&am=${total}&cu=INR`
+  };
+  window.location.href = urls[app];
+  showToast(`Opening ${app} for payment...`);
+}
+
+function confirmPayment(){
+  const pk = document.getElementById('passkeyInput').value;
+  if(!pk){showToast('Enter passkey / UPI PIN');return;}
+  saveOrderToDB('prepaid','paid');
+  document.getElementById('orderSuccess').style.display='block';
+  document.getElementById('paymentScreen').scrollTop=9999;
+  setTimeout(()=>{document.getElementById('paymentScreen').style.display='none';},3500);
+  showToast('🎉 Order placed successfully!');
+}
+
+function completeCODOrder(){
+  saveOrderToDB('cod','pending');
+  document.getElementById('cartPanel').style.display='none';
+  showToast('✅ Order placed! Pay on delivery.');
+}
+
+function closePayment(){document.getElementById('paymentScreen').style.display='none';}
+
+function saveOrderToDB(method, payStatus){
+  cart = DB.get('cart')||[];
+  const user = DB.get('currentUser');
+  const sub = cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const dc = sub>=(DB.get('freeDeliveryAbove')||499)?0:(DB.get('deliveryCharge')||40);
+  const total = sub + dc - discount;
+  const orders = DB.get('orders')||[];
+  const newOrder = {
+    id:'ORD'+Date.now(),
+    userId:user.email,
+    userName:user.name,
+    userEmail:user.email,
+    userPhone:user.phone,
+    items:[...cart],
+    subtotal:sub,
+    deliveryCharge:dc,
+    discount,
+    total,
+    address:user.deliveryAddress,
+    paymentMethod:method,
+    paymentStatus:payStatus,
+    status:'pending',
+    assignedTo:null,
+    timestamp:new Date().toLocaleString(),
+    orderType:method==='cod'?'Postpaid (COD)':'Prepaid (Online)'
+  };
+  orders.unshift(newOrder);
+  DB.set('orders',orders);
+  DB.set('cart',[]);
+  cart=[];
+  discount=0;
+  updateCartBadge();
+}
+
+// ============================================================
+// ADDRESS
+// ============================================================
+function showAddressModal(){document.getElementById('addressModal').style.display='block';}
+function closeAddressModal(){document.getElementById('addressModal').style.display='none';}
+
+function useCurrentLocation(){
+  if(!navigator.geolocation){showToast('Geolocation not supported');return;}
+  showToast('Getting location...');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const addr = `Lat: ${pos.coords.latitude.toFixed(4)}, Lng: ${pos.coords.longitude.toFixed(4)}`;
+    document.getElementById('addrStreet').value = addr;
+    showToast('Location fetched!');
+  },()=>showToast('Location permission denied'));
+}
+
+function saveAddress(){
+  const door=document.getElementById('addrDoor').value.trim();
+  const street=document.getElementById('addrStreet').value.trim();
+  const landmark=document.getElementById('addrLandmark').value.trim();
+  const city=document.getElementById('addrCity').value.trim();
+  const state=document.getElementById('addrState').value.trim();
+  const pin=document.getElementById('addrPin').value.trim();
+  if(!street||!city){showToast('Please enter street and city');return;}
+  const full = [door,street,landmark,city,state,pin].filter(Boolean).join(', ');
+  const user = DB.get('currentUser');
+  if(user){user.deliveryAddress=full;DB.set('currentUser',user);}
+  const addr = document.getElementById('currentAddress');
+  if(addr) addr.textContent=full;
+  closeAddressModal();
+  showToast('Address saved!');
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchAuthTab(tab,btn){
+  ['loginForm','registerForm','adminForm','deliveryForm'].forEach(id=>{document.getElementById(id).style.display='none';});
+  document.getElementById(tab+'Form').style.display='block';
+  document.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value.trim();
+  if(!email||!pass){showToast('Fill all fields');return;}
+  const users=DB.get('users')||[];
+  const user=users.find(u=>u.email===email&&u.password===pass);
+  if(!user){showToast('Invalid credentials');return;}
+  DB.set('currentUser',user);
+  showMainApp(user);
+}
+
+function doRegister(){
+  const name=document.getElementById('regName').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const phone=document.getElementById('regPhone').value.trim();
+  const pass=document.getElementById('regPass').value.trim();
+  const addr=document.getElementById('regAddress').value.trim();
+  if(!name||!email||!phone||!pass){showToast('Fill all required fields');return;}
+  const users=DB.get('users')||[];
+  if(users.find(u=>u.email===email)){showToast('Email already registered');return;}
+  const newUser={name,email,phone,password:pass,deliveryAddress:addr,createdAt:new Date().toLocaleString()};
+  users.push(newUser);
+  DB.set('users',users);
+  DB.set('currentUser',newUser);
+  showToast('Account created!');
+  showMainApp(newUser);
+}
+
+function doAdminLogin(){
+  const email=document.getElementById('adminEmail').value.trim();
+  const pass=document.getElementById('adminPass').value.trim();
+  const creds=DB.get('adminCreds')||{};
+  if(email===creds.email&&pass===creds.password){
+    document.getElementById('authScreen').style.display='none';
+    showAdminPanel();
+  } else showToast('Invalid admin credentials');
+}
+
+function doDeliveryLogin(){
+  const email=document.getElementById('dbEmail').value.trim();
+  const pass=document.getElementById('dbPass').value.trim();
+  const boys=DB.get('deliveryBoys')||[];
+  const boy=boys.find(b=>b.email===email&&b.password===pass);
+  if(!boy){showToast('Invalid delivery credentials');return;}
+  DB.set('currentDB',boy);
+  document.getElementById('authScreen').style.display='none';
+  showDBPanel(boy);
+}
+
+function doLogout(){
+  if(!confirm('Logout?')) return;
+  DB.remove('currentUser');
+  DB.set('cart',[]);
+  cart=[];
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('bottomNav').style.display='none';
+  document.getElementById('authScreen').style.display='block';
+}
+
+function showForgot(){document.getElementById('forgotModal').style.display='block';}
+function closeForgot(){document.getElementById('forgotModal').style.display='none';}
+function doForgot(){
+  const phone=document.getElementById('forgotPhone').value.trim();
+  const newPass=document.getElementById('forgotNewPass').value.trim();
+  const creds=DB.get('adminCreds')||{};
+  if(phone===creds.phone){
+    creds.password=newPass;
+    DB.set('adminCreds',creds);
+    showToast('Admin password reset!');
+    closeForgot();
+  } else {
+    const users=DB.get('users')||[];
+    const u=users.find(x=>x.phone===phone);
+    if(u){u.password=newPass;DB.set('users',users);showToast('Password reset!');closeForgot();}
+    else showToast('Phone not found');
+  }
+}
+
+// ============================================================
+// MAIN APP
+// ============================================================
+function showMainApp(user){
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  document.getElementById('bottomNav').style.display='flex';
+  const a=document.getElementById('currentAddress');
+  if(a) a.textContent=user.deliveryAddress||t('addAddress');
+  cart=DB.get('cart')||[];
+  updateCartBadge();
+  renderCategories();
+  filterCategory('all');
+  applyLang();
+}
+
+function showHome(){
+  document.getElementById('ordersPage').style.display='none';
+  document.getElementById('productsGrid').style.display='grid';
+  document.querySelectorAll('.bottom-nav-item').forEach((b,i)=>{b.classList.toggle('active',i===0);});
+}
+
+function showOrders(){
+  const user=DB.get('currentUser');
+  if(!user){showToast('Please login');return;}
+  document.getElementById('productsGrid').style.display='none';
+  const op=document.getElementById('ordersPage');
+  op.style.display='block';
+  const orders=DB.get('orders')||[];
+  const myOrders=orders.filter(o=>o.userId===user.email);
+  if(!myOrders.length){op.innerHTML='<div style="text-align:center;padding:40px;color:#9ca3af;">No orders yet 📦</div>';return;}
+  op.innerHTML='<div style="font-size:18px;font-weight:900;margin-bottom:14px;">My Orders</div>'+
+    myOrders.map(o=>`
+      <div class="order-history-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:14px;font-weight:800;color:var(--green-dark)">${o.id}</div>
+          <span class="status-badge ${o.status==='delivered'?'badge-delivered':o.status==='assigned'?'badge-assigned':'badge-pending'}">${o.status}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text2);">${o.timestamp}</div>
+        <div style="margin:8px 0;">${o.items.map(i=>`<div style="font-size:13px;">• ${i.name} x${i.qty} — ₹${i.price*i.qty}</div>`).join('')}</div>
+        <div style="display:flex;justify-content:space-between;font-weight:800;color:var(--text)">
+          <span>Total: ₹${o.total}</span>
+          <span class="status-badge ${o.paymentMethod==='cod'?'badge-cod':'badge-prepaid'}">${o.orderType}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:6px;">📍 ${o.address}</div>
+      </div>`).join('');
+  document.querySelectorAll('.bottom-nav-item').forEach((b,i)=>{b.classList.toggle('active',i===1);});
+}
+
+// ============================================================
+// ADMIN PANEL
+// ============================================================
+function openAdminLogin(){
+  document.getElementById('authScreen').style.display='block';
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('bottomNav').style.display='none';
+  switchAuthTab('admin',document.getElementById('tabAdmin'));
+}
+
+function showAdminPanel(){
+  document.getElementById('adminPanel').style.display='block';
+  adminTab('dashboard',document.querySelector('.admin-tab'));
+}
+function closeAdmin(){
+  document.getElementById('adminPanel').style.display='none';
+  const user=DB.get('currentUser');
+  if(user){showMainApp(user);}
+  else{document.getElementById('authScreen').style.display='block';}
+}
+
+function adminTab(tab,btn){
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const c=document.getElementById('adminContent');
+  if(tab==='dashboard') renderAdminDash(c);
+  else if(tab==='orders') renderAdminOrders(c);
+  else if(tab==='products') renderAdminProducts(c);
+  else if(tab==='delivery') renderAdminDelivery(c);
+  else if(tab==='customers') renderAdminCustomers(c);
+  else if(tab==='settings') renderAdminSettings(c);
+  else if(tab==='code') renderAdminCode(c);
+}
+
+function renderAdminDash(c){
+  const orders=DB.get('orders')||[];
+  const users=DB.get('users')||[];
+  const prods=DB.get('products')||[];
+  const revenue=orders.filter(o=>o.paymentStatus==='paid').reduce((a,o)=>a+o.total,0);
+  c.innerHTML=`
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">${orders.length}</div><div class="stat-label">Total Orders</div></div>
+    <div class="stat-card"><div class="stat-num">${users.length}</div><div class="stat-label">Customers</div></div>
+    <div class="stat-card"><div class="stat-num">₹${revenue}</div><div class="stat-label">Revenue</div></div>
+    <div class="stat-card"><div class="stat-num">${prods.length}</div><div class="stat-label">Products</div></div>
+  </div>
+  <div class="admin-card"><h3>Recent Orders</h3>
+    ${orders.slice(0,5).map(o=>`
+      <div class="order-row ${o.status}">
+        <div style="display:flex;justify-content:space-between"><b>${o.id}</b><span class="status-badge ${o.status==='delivered'?'badge-delivered':o.status==='assigned'?'badge-assigned':'badge-pending'}">${o.status}</span></div>
+        <div style="font-size:13px;color:var(--text2)">${o.userName} | ${o.userPhone}</div>
+        <div style="font-size:13px">₹${o.total} | <span class="status-badge ${o.paymentMethod==='cod'?'badge-cod':'badge-prepaid'}">${o.orderType}</span></div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function renderAdminOrders(c){
+  const orders=DB.get('orders')||[];
+  const boys=DB.get('deliveryBoys')||[];
+  c.innerHTML=`<div class="admin-card"><h3>📦 All Orders (${orders.length})</h3>
+    ${orders.map(o=>`
+      <div class="order-row ${o.status}" id="adminOrder_${o.id}">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+          <b>${o.id}</b>
+          <span class="status-badge ${o.status==='delivered'?'badge-delivered':o.status==='assigned'?'badge-assigned':'badge-pending'}">${o.status}</span>
+        </div>
+        <div style="font-size:13px;margin:4px 0"><b>${o.userName}</b> | ${o.userEmail} | ${o.userPhone}</div>
+        <div style="font-size:13px;color:var(--text2)">${o.timestamp}</div>
+        <div style="font-size:13px;margin:4px 0">${o.items.map(i=>`${i.name} x${i.qty}`).join(' | ')}</div>
+        <div style="font-size:14px;font-weight:800">₹${o.total} | <span class="status-badge ${o.paymentMethod==='cod'?'badge-cod':'badge-prepaid'}">${o.orderType}</span></div>
+        <div style="font-size:12px;color:var(--text2)">📍 ${o.address}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <select id="assignSel_${o.id}" style="padding:8px;border-radius:10px;border:2px solid var(--border);font-size:13px;">
+            <option value="">Assign Delivery Boy</option>
+            ${boys.map(b=>`<option value="${b.id}" ${o.assignedTo==b.id?'selected':''}>${b.name}</option>`).join('')}
+          </select>
+          <button class="btn-green" onclick="assignOrder('${o.id}')">Assign</button>
+          <button class="btn-orange" onclick="markDelivered('${o.id}')">Mark Delivered</button>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function assignOrder(oid){
+  const sel=document.getElementById('assignSel_'+oid);
+  if(!sel||!sel.value){showToast('Select delivery boy');return;}
+  const orders=DB.get('orders')||[];
+  const o=orders.find(x=>x.id===oid);
+  if(o){o.assignedTo=parseInt(sel.value);o.status='assigned';}
+  DB.set('orders',orders);
+  showToast('Order assigned!');
+  renderAdminOrders(document.getElementById('adminContent'));
+}
+
+function markDelivered(oid){
+  const orders=DB.get('orders')||[];
+  const o=orders.find(x=>x.id===oid);
+  if(o){o.status='delivered';o.paymentStatus='paid';}
+  DB.set('orders',orders);
+  showToast('Marked as delivered!');
+  renderAdminOrders(document.getElementById('adminContent'));
+}
+
+function renderAdminProducts(c){
+  const prods=DB.get('products')||[];
+  c.innerHTML=`
+  <div class="admin-card">
+    <h3>➕ Add / Edit Product</h3>
+    <div class="admin-form">
+      <input type="hidden" id="editProdId">
+      <div class="form-row">
+        <div class="form-group"><label>Product Name</label><input id="pName" placeholder="e.g. Fresh Tomatoes"></div>
+        <div class="form-group"><label>Category</label>
+          <select id="pCat">${['grocery','fruits','vegetables','dairy','bakery','snacks','beverages'].map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Price (₹)</label><input type="number" id="pPrice"></div>
+        <div class="form-group"><label>Original Price (₹)</label><input type="number" id="pOrigPrice"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Unit (e.g. 1 kg)</label><input id="pUnit" placeholder="1 kg"></div>
+        <div class="form-group"><label>Stock Quantity</label><input type="number" id="pStock" placeholder="100"></div>
+      </div>
+      <div class="form-group"><label>Offer Text (e.g. 20% OFF)</label><input id="pOffer"></div>
+      <div class="form-group"><label>Photo URLs (one per line, max 5)</label><textarea id="pPhotos" rows="3" placeholder="https://images.unsplash.com/..."></textarea></div>
+      <div class="form-group"><label>Video URL (optional, 30s promo)</label><input id="pVideo" placeholder="https://..."></textarea></div>
+      <div class="photo-upload-area" onclick="document.getElementById('photoFileInput').click()">
+        📸 Click to upload product photos (max 5)
+        <input type="file" id="photoFileInput" accept="image/*,video/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+      </div>
+      <div class="photo-preview-row" id="photoPreviewRow"></div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-green" onclick="saveProduct()">💾 Save Product</button>
+        <button class="btn-red" onclick="clearProdForm()">Clear</button>
+      </div>
+    </div>
+  </div>
+  <div class="admin-card"><h3>📦 All Products (${prods.length})</h3>
+    ${prods.map(p=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <img src="${(p.photos&&p.photos[0])||''}" style="width:50px;height:50px;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14px">${p.name}</div>
+          <div style="font-size:12px;color:var(--text2)">${p.category} | ₹${p.price} | Stock:${p.stock||0}</div>
+        </div>
+        <button class="btn-green" style="padding:6px 12px;font-size:12px" onclick="editProduct(${p.id})">Edit</button>
+        <button class="btn-red" style="padding:6px 12px;font-size:12px" onclick="deleteProduct(${p.id})">Del</button>
+      </div>`).join('')}
+  </div>`;
+}
+
+function handlePhotoUpload(e){
+  const files=[...e.target.files].slice(0,5);
+  const row=document.getElementById('photoPreviewRow');
+  const urls=[];
+  files.forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      urls.push(ev.target.result);
+      row.innerHTML=urls.map(u=>`<img src="${u}" class="photo-thumb">`).join('');
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function saveProduct(){
+  const prods=DB.get('products')||[];
+  const eid=document.getElementById('editProdId').value;
+  const photosText=document.getElementById('pPhotos').value.trim();
+  const uploadedThumbs=[...document.querySelectorAll('#photoPreviewRow img')].map(i=>i.src);
+  const textUrls=photosText?photosText.split('\n').filter(Boolean):[];
+  const allPhotos=[...uploadedThumbs,...textUrls].slice(0,5);
+  const prod={
+    id:eid?parseInt(eid):(Date.now()),
+    name:document.getElementById('pName').value.trim(),
+    category:document.getElementById('pCat').value,
+    price:parseInt(document.getElementById('pPrice').value)||0,
+    originalPrice:parseInt(document.getElementById('pOrigPrice').value)||0,
+    unit:document.getElementById('pUnit').value.trim()||'1 unit',
+    stock:parseInt(document.getElementById('pStock').value)||0,
+    offer:document.getElementById('pOffer').value.trim(),
+    photos:allPhotos.length?allPhotos:['https://via.placeholder.com/300x140?text=FreshMart'],
+    video:document.getElementById('pVideo').value.trim()
+  };
+  if(!prod.name){showToast('Enter product name');return;}
+  if(eid){
+    const idx=prods.findIndex(p=>p.id===prod.id);
+    if(idx!==-1)prods[idx]=prod;
+  } else prods.push(prod);
+  DB.set('products',prods);
+  showToast('Product saved!');
+  clearProdForm();
+  renderAdminProducts(document.getElementById('adminContent'));
+}
+
+function editProduct(id){
+  const p=(DB.get('products')||[]).find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('editProdId').value=p.id;
+  document.getElementById('pName').value=p.name;
+  document.getElementById('pCat').value=p.category;
+  document.getElementById('pPrice').value=p.price;
+  document.getElementById('pOrigPrice').value=p.originalPrice||'';
+  document.getElementById('pUnit').value=p.unit;
+  document.getElementById('pStock').value=p.stock||'';
+  document.getElementById('pOffer').value=p.offer||'';
+  document.getElementById('pPhotos').value=(p.photos||[]).join('\n');
+  document.getElementById('pVideo').value=p.video||'';
+  window.scrollTo(0,0);
+  showToast('Product loaded for editing');
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete product?'))return;
+  let prods=DB.get('products')||[];
+  prods=prods.filter(p=>p.id!==id);
+  DB.set('products',prods);
+  showToast('Product deleted');
+  renderAdminProducts(document.getElementById('adminContent'));
+}
+
+function clearProdForm(){
+  ['editProdId','pName','pPrice','pOrigPrice','pUnit','pStock','pOffer','pPhotos','pVideo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('photoPreviewRow').innerHTML='';
+}
+
+function renderAdminDelivery(c){
+  const boys=DB.get('deliveryBoys')||[];
+  c.innerHTML=`
+  <div class="admin-card"><h3>🚴 Delivery Boys (${boys.length})</h3>
+    ${boys.map(b=>`
+      <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:8px">
+        <div style="font-weight:800">${b.name}</div>
+        <div style="font-size:13px;color:var(--text2)">${b.email} | ${b.phone}</div>
+      </div>`).join('')}
+  </div>
+  <div class="admin-card"><h3>➕ Add Delivery Boy</h3>
+    <div class="admin-form">
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input id="dbName2" placeholder="Full name"></div>
+        <div class="form-group"><label>Phone</label><input id="dbPhone2" placeholder="10-digit"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input id="dbEmail2" placeholder="email@freshmart.com"></div>
+        <div class="form-group"><label>Password</label><input id="dbPass2" placeholder="Password"></div>
+      </div>
+      <button class="btn-green" onclick="addDeliveryBoy()">Add Delivery Boy</button>
+    </div>
+  </div>`;
+}
+
+function addDeliveryBoy(){
+  const name=document.getElementById('dbName2').value.trim();
+  const phone=document.getElementById('dbPhone2').value.trim();
+  const email=document.getElementById('dbEmail2').value.trim();
+  const pass=document.getElementById('dbPass2').value.trim();
+  if(!name||!email||!pass){showToast('Fill all fields');return;}
+  const boys=DB.get('deliveryBoys')||[];
+  boys.push({id:Date.now(),name,phone,email,password:pass});
+  DB.set('deliveryBoys',boys);
+  showToast('Delivery boy added!');
+  renderAdminDelivery(document.getElementById('adminContent'));
+}
+
+function renderAdminCustomers(c){
+  const users=DB.get('users')||[];
+  const orders=DB.get('orders')||[];
+  c.innerHTML=`
+  <div class="admin-card"><h3>👥 Customers (${users.length})</h3>
+    ${users.map(u=>`
+      <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:8px">
+        <div style="font-weight:800">${u.name}</div>
+        <div style="font-size:13px;color:var(--text2)">📧 ${u.email}</div>
+        <div style="font-size:13px;color:var(--text2)">📱 ${u.phone}</div>
+        <div style="font-size:12px;margin-top:4px">Orders: ${orders.filter(o=>o.userId===u.email).length}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function renderAdminSettings(c){
+  const creds=DB.get('adminCreds')||{};
+  const offers=DB.get('offers')||{};
+  c.innerHTML=`
+  <div class="admin-card"><h3>⚙️ Admin Credentials</h3>
+    <div class="admin-form">
+      <div class="form-group"><label>Admin Email</label><input id="setEmail" value="${creds.email||''}"></div>
+      <div class="form-group"><label>Admin Password</label><input type="password" id="setPass" value="${creds.password||''}"></div>
+      <div class="form-group"><label>Recovery Phone</label><input id="setPhone" value="${creds.phone||''}"></div>
+      <button class="btn-green" onclick="saveAdminCreds()">Save Credentials</button>
+    </div>
+  </div>
+  <div class="admin-card"><h3>💳 UPI Payment ID</h3>
+    <div class="admin-form">
+      <div class="form-group"><label>UPI ID</label><input id="setUpi" value="${creds.upiId||'6380777399@ptaxis'}"></div>
+      <button class="btn-green" onclick="saveUpi()">Save UPI ID</button>
+    </div>
+  </div>
+  <div class="admin-card"><h3>🚚 Delivery Charges</h3>
+    <div class="admin-form">
+      <div class="form-row">
+        <div class="form-group"><label>Delivery Charge (₹)</label><input type="number" id="setDC" value="${DB.get('deliveryCharge')||40}"></div>
+        <div class="form-group"><label>Free above (₹)</label><input type="number" id="setFD" value="${DB.get('freeDeliveryAbove')||499}"></div>
+      </div>
+      <button class="btn-green" onclick="saveDeliveryCharge()">Save</button>
+    </div>
+  </div>
+  <div class="admin-card"><h3>🏷️ Offer Codes</h3>
+    <div class="admin-form">
+      ${Object.entries(offers).map(([k,v])=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <input value="${k}" id="ofKey_${k}" style="width:100px;padding:8px;border:2px solid var(--border);border-radius:10px">
+          <input type="number" value="${v}" id="ofVal_${k}" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:10px">
+          <span style="font-size:12px;color:var(--text2)">${v>100?'₹'+v:'%'+v} off</span>
+          <button class="btn-red" style="padding:6px 12px;font-size:12px" onclick="deleteOffer('${k}')">Del</button>
+        </div>`).join('')}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="newOfKey" placeholder="Code" style="width:100px;padding:8px;border:2px solid var(--border);border-radius:10px">
+        <input type="number" id="newOfVal" placeholder="Value" style="width:80px;padding:8px;border:2px solid var(--border);border-radius:10px">
+        <button class="btn-green" onclick="addOffer()" style="padding:8px 14px">Add</button>
+      </div>
+      <button class="btn-green" onclick="saveOffers()" style="margin-top:10px">Save Offers</button>
+    </div>
+  </div>`;
+}
+
+function saveAdminCreds(){
+  const creds=DB.get('adminCreds')||{};
+  creds.email=document.getElementById('setEmail').value.trim();
+  creds.password=document.getElementById('setPass').value.trim();
+  creds.phone=document.getElementById('setPhone').value.trim();
+  DB.set('adminCreds',creds);
+  showToast('Admin credentials updated!');
+}
+function saveUpi(){
+  const creds=DB.get('adminCreds')||{};
+  creds.upiId=document.getElementById('setUpi').value.trim();
+  DB.set('adminCreds',creds);
+  showToast('UPI ID updated!');
+}
+function saveDeliveryCharge(){
+  DB.set('deliveryCharge',parseInt(document.getElementById('setDC').value)||40);
+  DB.set('freeDeliveryAbove',parseInt(document.getElementById('setFD').value)||499);
+  showToast('Delivery charges saved!');
+}
+function deleteOffer(k){const o=DB.get('offers')||{};delete o[k];DB.set('offers',o);renderAdminSettings(document.getElementById('adminContent'));}
+function addOffer(){const k=document.getElementById('newOfKey').value.trim().toUpperCase();const v=parseInt(document.getElementById('newOfVal').value);if(!k||!v){showToast('Fill code and value');return;}const o=DB.get('offers')||{};o[k]=v;DB.set('offers',o);showToast('Offer added!');renderAdminSettings(document.getElementById('adminContent'));}
+function saveOffers(){const offers=DB.get('offers')||{};const newO={};Object.keys(offers).forEach(k=>{const nk=document.getElementById('ofKey_'+k)?.value.trim().toUpperCase();const nv=parseInt(document.getElementById('ofVal_'+k)?.value)||0;if(nk)newO[nk]=nv;});DB.set('offers',newO);showToast('Offers saved!');}
+
+function renderAdminCode(c){
+  c.innerHTML=`
+  <div class="admin-card"><h3>💻 Source Code Editor</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">⚠️ Edit with caution. Changes are saved and applied on next load.</p>
+    <div class="code-editor">
+      <textarea id="codeEditor" spellcheck="false">${escHtml(document.documentElement.outerHTML)}</textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn-green" onclick="saveCode()">💾 Save & Download Code</button>
+      <button class="btn-orange" onclick="copyCode()">📋 Copy Code</button>
+    </div>
+  </div>`;
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function saveCode(){
+  const code=document.getElementById('codeEditor').value;
+  const blob=new Blob([code],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='FreshMart_Updated.html';
+  a.click();
+  showToast('Code downloaded!');
+}
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('codeEditor').value).then(()=>showToast('Code copied!'));
+}
+
+// ============================================================
+// DELIVERY BOY PANEL
+// ============================================================
+function showDBPanel(boy){
+  document.getElementById('dbPanel').style.display='block';
+  document.getElementById('dbName').textContent='👋 '+boy.name;
+  renderDBContent(boy);
+}
+
+function renderDBContent(boy){
+  const orders=DB.get('orders')||[];
+  const myOrders=orders.filter(o=>o.assignedTo===boy.id);
+  const c=document.getElementById('dbContent');
+  if(!myOrders.length){c.innerHTML='<div style="text-align:center;padding:40px;color:#9ca3af;">No orders assigned yet 🚴</div>';return;}
+  c.innerHTML=`<div style="font-size:18px;font-weight:900;margin-bottom:14px;">My Deliveries</div>`+
+    myOrders.map(o=>`
+      <div class="db-order">
+        <div style="display:flex;justify-content:space-between"><b>${o.id}</b><span class="status-badge ${o.status==='delivered'?'badge-delivered':'badge-assigned'}">${o.status}</span></div>
+        <div style="font-size:14px;font-weight:700;margin:6px 0">${o.userName} | ${o.userPhone}</div>
+        <div style="font-size:13px;color:var(--text2)">📍 ${o.address}</div>
+        <div style="font-size:13px;margin:6px 0">${o.items.map(i=>`${i.name} x${i.qty}`).join(', ')}</div>
+        <div style="font-weight:800">₹${o.total} | ${o.orderType}</div>
+        ${o.status!=='delivered'?`<button class="deliver-btn" onclick="markDBDelivered('${o.id}',${boy.id})">✅ Mark as Delivered</button>`:'<div style="color:var(--green);font-weight:700;margin-top:8px">✅ Delivered</div>'}
+      </div>`).join('');
+}
+
+function markDBDelivered(oid,boyId){
+  const orders=DB.get('orders')||[];
+  const o=orders.find(x=>x.id===oid);
+  if(o){o.status='delivered';o.paymentStatus='paid';}
+  DB.set('orders',orders);
+  showToast('Marked as delivered!');
+  const boy=(DB.get('deliveryBoys')||[]).find(b=>b.id===boyId);
+  if(boy) renderDBContent(boy);
+}
+
+function closeDB(){
+  document.getElementById('dbPanel').style.display='none';
+  DB.remove('currentDB');
+  document.getElementById('authScreen').style.display='block';
+}
+
+// ============================================================
+// INSTALL PWA
+// ============================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').style.display='block';});
+function installApp(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('installBtn').style.display='none';});}
+  else {
+    const a=document.createElement('a');
+    a.href=window.location.href;
+    a.download='FreshMart.html';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    showToast('Downloading app file...');
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimeout;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded',()=>{
+  initData();
+  currentLang=DB.get('appLang')||'en';
+  // Splash
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hide');
+    // Auto-login check
+    const user=DB.get('currentUser');
+    const dbUser=DB.get('currentDB');
+    if(user){showMainApp(user);}
+    else if(dbUser){showDBPanel(dbUser);}
+    else{document.getElementById('authScreen').style.display='block';}
+    applyLang();
+  },2800);
+});
+
+// Close address modal on outside click
+document.getElementById('addressModal').addEventListener('click',function(e){if(e.target===this)closeAddressModal();});
+document.getElementById('forgotModal').addEventListener('click',function(e){if(e.target===this)closeForgot();});
+</script>
+
+
+</body></html>
